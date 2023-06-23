@@ -1,83 +1,42 @@
-const listUser = [
-  {
-    id: 1,
-    nik: 165323212313,
-    name: 'sample name',
-    gender: 'male',
-    address: 'alamat',
-    religion: 'islam',
-    maritalStatus: 'merried',
-    jobTitle: 'wiraswasta',
-    nationality: 'WNI',
-    expiredDate: 'Seumur hidup',
-    createAt: '2022-05-12',
-    updateAt: '2022-05-12',
-  },
-  {
-    id: 2,
-    nik: 165323212313,
-    name: 'sample name',
-    gender: 'male',
-    address: 'alamat',
-    religion: 'islam',
-    maritalStatus: 'merried',
-    jobTitle: 'wiraswasta',
-    nationality: 'WNI',
-    expiredDate: 'Seumur hidup',
-    createAt: '2022-05-12',
-    updateAt: '2022-05-12',
-  },
-  {
-    id: 3,
-    nik: 165323212313,
-    name: 'sample name',
-    gender: 'male',
-    address: 'alamat',
-    religion: 'islam',
-    maritalStatus: 'merried',
-    jobTitle: 'wiraswasta',
-    nationality: 'WNI',
-    expiredDate: 'Seumur hidup',
-    createAt: '2022-05-12',
-    updateAt: '2022-05-12',
-  },
-  {
-    id: 4,
-    nik: 165323212313,
-    name: 'sample name',
-    gender: 'male',
-    address: 'alamat',
-    religion: 'islam',
-    maritalStatus: 'merried',
-    jobTitle: 'wiraswasta',
-    nationality: 'WNI',
-    expiredDate: 'Seumur hidup',
-    createAt: '2022-05-12',
-    updateAt: '2022-05-12',
-  },
-  {
-    id: 5,
-    nik: 165323212313,
-    name: 'sample name',
-    gender: 'male',
-    address: 'alamat',
-    religion: 'islam',
-    maritalStatus: 'merried',
-    jobTitle: 'wiraswasta',
-    nationality: 'WNI',
-    expiredDate: 'Seumur hidup',
-    createAt: '2022-05-12',
-    updateAt: '2022-05-12',
-  },
-];
-
-const getAllUsers = (req, res) => {
-  const data = { statusCode: 200, message: 'data found', data: listUser };
-  res.send(data);
+import usersModel from '../model/usersModel.js';
+import errorResponse from '../validationAndErrors/errorResponse.js';
+const getAllUsers = async (req, res) => {
+  try {
+    const [data] = await usersModel.getAllUsers();
+    res.send({ message: 'success', data });
+  } catch (error) {
+    res.status(500).send({ message: 'failed', data: error.message });
+    // errorResponse.notAcceptableError(res, error);
+  }
 };
-const createNewUser = (req, res) => {
-  const data = req.body;
-  res.send(data);
+const createNewUser = async (req, res) => {
+  const paylaod = req.body;
+  if (!paylaod.name || !paylaod.address) {
+    errorResponse.badRequestError(res, 'mohon check data anda');
+  }
+  try {
+    await usersModel.addNewUser(req.body);
+    res.send({ message: 'success edit data user', data: req.body });
+  } catch (error) {
+    res.status(500).send({ message: 'failed', data: error.message });
+  }
+};
+const editUser = async (req, res) => {
+  try {
+    await usersModel.editUser(req.body, req.params.idUser);
+    res.send({ message: 'success update data user', data: req.body });
+  } catch (error) {
+    res.status(500).send({ message: 'failed', data: error.message });
+  }
 };
 
-export default { getAllUsers, createNewUser };
+const deleteUser = async (req, res) => {
+  try {
+    await usersModel.deleteUser(req.params.idUser);
+    res.send({ message: 'success delete data user' });
+  } catch (error) {
+    res.status(500).send({ message: 'failed', data: error.message });
+  }
+};
+
+export default { getAllUsers, createNewUser, editUser, deleteUser };
